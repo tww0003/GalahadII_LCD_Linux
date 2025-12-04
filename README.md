@@ -37,7 +37,7 @@ You'll likely need to pip install pyav
 -$ sudo pacman -S python-av
 ```
 
-Then run the script with your chosen gif
+Then run the script with your chosen gif, use -h to list args for rotating the GIF, changing VID/PID and frame interval speed.
 
 ```
 -$ python3 galahadII_LCD.py -i frieren.gif
