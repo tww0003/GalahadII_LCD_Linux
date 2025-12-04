@@ -207,7 +207,7 @@ def main():
     )
     parser.add_argument('-r','--rotate', 
         type=int, 
-        help='Rotate GIF, counter-clockwise default: -90',
+        help='Rotate GIF, counter-clockwise default: 0/No rotation',
         default=0, 
         required=False
     )
