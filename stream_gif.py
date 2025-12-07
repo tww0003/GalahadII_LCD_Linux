@@ -65,12 +65,12 @@ def convert_gif_to_h264(input_path, output_path):
 
     output_container = av.open(output_path, mode='w', format='h264')
     
-    stream = output_container.add_stream('libx264', rate=10)
+    stream = output_container.add_stream('libx264', rate=source_fps)
     stream.width = 480
     stream.height = 480
     stream.pix_fmt = 'yuv420p'
     
-    stream.bit_rate = 2000000      # 2 Mbps (Arbitrary safe value for valid CBR)
+    stream.bit_rate = 4000000 # 4 Mbps (Arbitrary safe value for valid CBR)
 
     stream.options = {
         'profile': 'baseline',

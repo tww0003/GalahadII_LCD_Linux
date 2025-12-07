@@ -34,8 +34,8 @@ def play_video():
         f.write(str(proc.pid))
 
 def main():
-    parser = argparse.ArgumentParser(description ='Lian Li Galahad II LCD Video')
-    parser.add_argument("input")
+    parser = argparse.ArgumentParser(description ='Example usage: ./splashstream file.gif')
+    parser.add_argument("gif", type=str, help="Any .gif file")
     parser.add_argument('-v','--vid', 
         type=int, 
         help='Vendor ID, default: 0x0416',
@@ -50,18 +50,18 @@ def main():
     )
     
     parser.add_argument('-s','--stop', 
-        help='Stop running the video',
+        help='Stop running the video. Supply a fake gif so it actually works since i\'m lazy.',
         action="store_true"
     )
 
     args = parser.parse_args()
     config.product_id = args.pid
     config.vendor_id = args.vid
-    if args.input is not None:
-        config.current_video = args.input
     if args.stop:
         stop_video()
         exit(0)
+    if args.gif is not None:
+        config.current_video = args.gif
     config.write_config()
     play_video()
 
