@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import subprocess
 import signal
@@ -35,7 +37,7 @@ def main():
     parser = argparse.ArgumentParser(description ='Lian Li Galahad II LCD Video')
     parser.add_argument('-i','--input', 
         type=str, 
-        help='Input gif to use',
+        help='Input gif to use.',
         required=False
     )
     parser.add_argument('-v','--vid', 
@@ -50,6 +52,7 @@ def main():
         default=0x7395, 
         required=False
     )
+    
     parser.add_argument('-s','--stop', 
         help='Stop running the video',
         action="store_true"
@@ -61,9 +64,10 @@ def main():
     if args.input is not None:
         config.current_video = args.input
         config.write_config()
-        play_video()
     if args.stop:
         stop_video()
+        exit(0)
+    play_video()
 
 if __name__ == "__main__":
     main()
