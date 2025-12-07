@@ -9,9 +9,10 @@ This script was created and tested on CachyOS (and Gentoo) - with some help from
 Please check out the original repository: https://github.com/H4rk3nz0/GalahadII_LCD_Linux
 H4rk3nzo did all the hard work, I just hacked together changes and updates to fit my needs.  
   
-The original project wasn't working for my hardware revision (`LianLi-GA_II-LCD_v1.4`) so I updated the script to work on my stuff but eventually I ended up with somthing quite different.  
+The original project wasn't working for my hardware revision (`LianLi-GA_II-LCD_v1.4`) so I fixed it but eventually I ended up with somthing quite different.  
 
-Here's some notable changes:
+Here's some notable changes:  
+
     - Updated the `REPORT_ID_VIDEO` variable from `0x03` to `0x02` to get the script working with my hardware
     - Added a virtual environment
     - Added a `requirements.txt` file
@@ -25,7 +26,7 @@ Here's some notable changes:
 
 ### USB Permissions  
 
-First identify/confirm that the GAII device is detected.
+First, identify/confirm that the GAII device is detected.  
 Make note of the ID value - 0416:7395 , these are set as the script default but may require changing!
 
 ```
@@ -33,14 +34,14 @@ Make note of the ID value - 0416:7395 , these are set as the script default but 
 Bus 001 Device 023: ID 0416:7395 Winbond Electronics Corp. LianLi-GA_II-LCD_v1.6
 ```
 
-Next - Create a `udev` rule for the USB device and set the permissions, changing your vendor and product id based on the earlier `lsusb` output
+Next, create a `udev` rule for the USB device and set the permissions, changing your vendor and product id based on the earlier `lsusb` output
 
 ```
 -$ echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="0416", ATTR{idProduct}=="7395", MODE="0666"' > 99-galahad.rules
 -$ sudo mv ./99-galahad.rules /etc/udev/rules.d/
 ```
 
-Then update the rules with `udevadm`
+Finally, update the rules with `udevadm`
 
 ```
 -$ sudo udevadm control --reload-rules
@@ -50,7 +51,7 @@ Then update the rules with `udevadm`
 ### Environment  
 
 Create a virtual environment for the gif streaming script to run in.
-I set up the script rather sloppily and I'm not a Python developer so currently the script requires a virtual environment living within a `venv` folder.  
+I set up the script rather sloppily and I'm not a Python dev so a `venv` is required until I get around to refactoring the smelly code I wrote.  
 
 ```
 -$ python3 -m venv venv
@@ -75,7 +76,7 @@ Run the script with your chosen gif, use -h to list args for stopping the GIF, a
 
 ```
 -$ ./splashstream frieren.gif
-Settings written to /home/topsoil/.config/splashstream/config.json
+Settings written to /home/tyler/.config/splashstream/config.json
 Previous video process killed
 Writing pid file: 1459626
 ```
