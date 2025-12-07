@@ -35,11 +35,7 @@ def play_video():
 
 def main():
     parser = argparse.ArgumentParser(description ='Lian Li Galahad II LCD Video')
-    parser.add_argument('-i','--input', 
-        type=str, 
-        help='Input gif to use.',
-        required=False
-    )
+    parser.add_argument("input")
     parser.add_argument('-v','--vid', 
         type=int, 
         help='Vendor ID, default: 0x0416',
