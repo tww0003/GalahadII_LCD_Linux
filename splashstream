@@ -23,7 +23,7 @@ def play_video():
     stop_video()
     with open(os.devnull, "wb") as devnull:
         proc = subprocess.Popen(
-            ["./venv/bin/python3", config.stream_script],
+            ["./venv/bin/python3", config.stream_script], # <--- this code... smells...
             stdout=devnull,
             stderr=devnull,
             stdin=devnull,
@@ -59,10 +59,10 @@ def main():
     config.vendor_id = args.vid
     if args.input is not None:
         config.current_video = args.input
-        config.write_config()
     if args.stop:
         stop_video()
         exit(0)
+    config.write_config()
     play_video()
 
 if __name__ == "__main__":
