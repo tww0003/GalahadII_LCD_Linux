@@ -55,11 +55,9 @@ class GalahadII_Vision:
 def convert_to_h264(input_path, output_path):
     print(f"[!] Converting {input_path} -> {output_path}...")
 
-    # Open input
     input_container = av.open(input_path)
     input_stream = input_container.streams.video[0]
 
-    # Detect format
     is_gif = (input_container.format.name == "gif")
 
     source_fps = input_stream.average_rate
@@ -73,7 +71,6 @@ def convert_to_h264(input_path, output_path):
 
     print(f"[!] Using FPS: {source_fps}")
 
-    # Output container (MP4)
     output_container = av.open(output_path, mode='w', format='mp4')
 
     stream = output_container.add_stream("libx264", rate=source_fps)
@@ -88,9 +85,7 @@ def convert_to_h264(input_path, output_path):
         "x264-params": "keyint=30:min-keyint=30:nal-hrd=cbr"
     }
 
-    # Filter graph
     graph = av.filter.Graph()
-
     buffer = graph.add_buffer(template=input_stream)
 
     # Maintain aspect ratio and add padding where needed
@@ -102,7 +97,7 @@ def convert_to_h264(input_path, output_path):
         # GIF requires forcing fps + pixel format
         fps_filter = graph.add("fps", f"fps={float(source_fps)}")
 
-    fmt = graph.add("format", "yuv420p")  # enforce YUV420 for encoder compatibility
+    fmt = graph.add("format", "yuv420p")
     sink = graph.add("buffersink")
 
     buffer.link_to(scale)

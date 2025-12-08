@@ -1,5 +1,5 @@
 # GalahadII LCD Linux
-A simple PyUSB script to stream a gif to the Lian-Li Galahad II LCD on Linux - because Linux deserves pretty things too.
+A simple PyUSB script to stream a gif or mp4 to the Lian-Li Galahad II LCD on Linux - because Linux deserves pretty things too.
 This script was created and tested on CachyOS (and Gentoo) - with some help from a Windows VM, USBPcap, and DNSpyEx for reversing L-Connect.  
 
 **NOTE** If this script isn't working, I recommend enumerating the values for the `REPORT_ID_VIDEO` variable until you find a number that works.
@@ -13,7 +13,8 @@ The original project wasn't working for my hardware revision (`LianLi-GA_II-LCD_
 
 Here's some notable changes:  
 
-    - Updated the `REPORT_ID_VIDEO` variable from `0x03` to `0x02` to get the script working with my hardware
+    - Updated the `REPORT_ID_VIDEO` variable from `0x03` to `0x02` to get the script working with `LianLi-GA_II-LCD_v1.4`
+    - Added support for mp4 files
     - Added a virtual environment
     - Added a `requirements.txt` file
     - Maintained the aspect ratio of the gif's
