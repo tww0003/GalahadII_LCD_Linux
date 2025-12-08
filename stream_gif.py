@@ -51,56 +51,74 @@ class GalahadII_Vision:
             idx_val += 1
             bytes_sent += chunk_len
 
-def convert_gif_to_h264(input_path, output_path):
+
+def convert_to_h264(input_path, output_path):
     print(f"[!] Converting {input_path} -> {output_path}...")
-    
+
+    # Open input
     input_container = av.open(input_path)
     input_stream = input_container.streams.video[0]
 
-    source_fps = input_stream.average_rate
-    print(f'[!] Detected FPS: {source_fps}')
-    if source_fps is None or float(source_fps) == 0:
-        print("[!] Warning: Source FPS likely wrong/not detected. Defaulting to 24")
-        source_fps = 24
+    # Detect format
+    is_gif = (input_container.format.name == "gif")
 
-    output_container = av.open(output_path, mode='w', format='h264')
-    
-    stream = output_container.add_stream('libx264', rate=source_fps)
+    source_fps = input_stream.average_rate
+    if source_fps is None or float(source_fps) == 0:
+        if is_gif:
+            print("[!] GIF has no FPS. Defaulting to 24.")
+            source_fps = 24
+        else:
+            print("[!] FPS missing on non-GIF, defaulting to 30.")
+            source_fps = 30
+
+    print(f"[!] Using FPS: {source_fps}")
+
+    # Output container (MP4)
+    output_container = av.open(output_path, mode='w', format='mp4')
+
+    stream = output_container.add_stream("libx264", rate=source_fps)
     stream.width = 480
     stream.height = 480
-    stream.pix_fmt = 'yuv420p'
-    
-    stream.bit_rate = 4000000 # 4 Mbps (Arbitrary safe value for valid CBR)
+    stream.pix_fmt = "yuv420p"
+    stream.bit_rate = 4_000_000
 
     stream.options = {
-        'profile': 'baseline',
-        'preset': 'veryfast',
-        'x264-params': 'keyint=30:min-keyint=30:nal-hrd=cbr' 
+        "profile": "baseline",
+        "preset": "veryfast",
+        "x264-params": "keyint=30:min-keyint=30:nal-hrd=cbr"
     }
 
+    # Filter graph
     graph = av.filter.Graph()
 
     buffer = graph.add_buffer(template=input_stream)
 
+    # Maintain aspect ratio and add padding where needed
     scale = graph.add("scale", "w=480:h=480:force_original_aspect_ratio=decrease")
     pad   = graph.add("pad",   "w=480:h=480:x=(ow-iw)/2:y=(oh-ih)/2:color=black")
-    fps = graph.add("fps", "fps=10")
-    
-    # IMPORTANT format filter to convert GIF (RGB/Paletted) to YUV420P
-    # Corrected pixel format :D - hopefully
-    fmt = graph.add("format", "yuv420p")
-    
+
+    fps_filter = None
+    if is_gif:
+        # GIF requires forcing fps + pixel format
+        fps_filter = graph.add("fps", f"fps={float(source_fps)}")
+
+    fmt = graph.add("format", "yuv420p")  # enforce YUV420 for encoder compatibility
     sink = graph.add("buffersink")
 
     buffer.link_to(scale)
     scale.link_to(pad)
-    pad.link_to(fps)
-    fps.link_to(fmt)
+
+    if is_gif:
+        pad.link_to(fps_filter)
+        fps_filter.link_to(fmt)
+    else:
+        pad.link_to(fmt)
+
     fmt.link_to(sink)
-    
+
     graph.configure()
 
-    # Process frames 
+    # Process frames
     for frame in input_container.decode(input_stream):
         graph.push(frame)
 
@@ -110,25 +128,24 @@ def convert_gif_to_h264(input_path, output_path):
                 for packet in stream.encode(filtered_frame):
                     output_container.mux(packet)
         except (av.error.BlockingIOError, av.error.EOFError):
-            continue
+            pass
 
-    # Flush
+    # Final flush
     graph.push(None)
-
     try:
         while True:
-            filtered_frame = graph.pull()
-            for packet in stream.encode(filtered_frame):
+            f = graph.pull()
+            for packet in stream.encode(f):
                 output_container.mux(packet)
-    except (av.error.BlockingIOError, av.error.EOFError):
+    except:
         pass
 
-    # Flush
     for packet in stream.encode():
         output_container.mux(packet)
 
     input_container.close()
     output_container.close()
+
     print("[+] Conversion Complete.")
     return source_fps
 
@@ -160,11 +177,11 @@ def main():
     config = GalahadConfig()
     config.load()
     device = GalahadII_Vision(config=config)
-    source_fps = convert_gif_to_h264(config.current_video, 'video.h264')
+    source_fps = convert_to_h264(config.current_video, 'video.h264')
 
     try:
         print(f"[+] Streaming '{config.current_video}'...")
-        frame_interval = 1 / source_fps
+        frame_interval = config.speed / source_fps
         while True:
             for frame_bytes in yield_ffmpeg_packets('video.h264'):
 

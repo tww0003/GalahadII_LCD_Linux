@@ -25,6 +25,7 @@ class GalahadConfig:
     pid_file = cfg_dir / pid_file_name
 
     stream_script = "stream_gif.py"
+    speed = 1
 
     def __init__(self):
         # Files
@@ -39,6 +40,7 @@ class GalahadConfig:
             self.current_video = user_settings["current_video"]
             self.product_id = user_settings["product_id"]
             self.vendor_id = user_settings["vendor_id"]
+            self.speed = user_settings["speed"]
 
     def write_config(self):
         with open(self.cfg_file, "w") as f:
@@ -46,6 +48,7 @@ class GalahadConfig:
             user_settings["current_video"] = self.current_video
             user_settings["product_id"] = self.product_id
             user_settings["vendor_id"] = self.vendor_id
+            user_settings["speed"] = self.speed
             json.dump(user_settings, f, indent=4)
 
 def main():
